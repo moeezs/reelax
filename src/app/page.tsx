@@ -62,6 +62,9 @@ export default function ReelaxApp() {
     const params = new URLSearchParams();
     if (genre) params.append('genre', genre);
     if (duration) params.append('duration', String(duration));
+    // Restrict to US and similar countries
+    params.append('region', 'US');
+    params.append('with_original_language', 'en');
     const url = `/api/getrecs?${params.toString()}`;
 
     try {
@@ -71,7 +74,10 @@ export default function ReelaxApp() {
         console.error('API error:', data);
         return [];
       }
-      return data.results || [];
+      // Less restrictive: only filter out adult content
+      return (data.results || []).filter((movie: any) => {
+        return !movie.adult;
+      });
     } catch (error) {
       console.error('Error fetching recommendations:', error);
       return [];
@@ -172,6 +178,27 @@ export default function ReelaxApp() {
               className={`w-3 h-3 rounded-full mx-1 transition-all duration-300 ${i <= step ? "bg-white shadow-lg" : "bg-white/30"}`}
             />
           ))}
+        </div>
+      )}
+      {/* Start Over & Share buttons take step counter place on final step */}
+      {step === totalSteps && (
+        <div className="absolute top-6 right-8 z-40 flex gap-4 items-center h-12">
+          <button
+            onClick={() => { setStep(0); router.push("/"); }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium"
+            style={{ position: 'relative', zIndex: 10 }}
+          >
+            <ArrowLeft size={20} />
+            <span className="hidden sm:inline">Start Over</span>
+          </button>
+          <button
+            onClick={() => setShowShare(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/70 text-white hover:bg-gray-700/80 transition-all duration-200 font-medium border border-white/10"
+            style={{ position: 'relative', zIndex: 10 }}
+          >
+            <Share2 size={20} />
+            <span className="hidden sm:inline">Share</span>
+          </button>
         </div>
       )}
       {step === 0 && (
@@ -318,29 +345,9 @@ export default function ReelaxApp() {
       )}
       {step === 4 && (
         <div className="w-full max-w-6xl mx-auto px-6 py-8 animate-fade-in pt-8">
-          <div className="flex justify-between items-center mb-8 relative" style={{ minHeight: '48px' }}>
-            <div className="flex gap-4">
-              <button
-                onClick={() => { setStep(0); router.push("/"); }}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium"
-                style={{ position: 'relative', zIndex: 10 }}
-              >
-                <ArrowLeft size={20} />
-                Start Over
-              </button>
-              <button
-                onClick={() => setShowShare(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/70 text-white hover:bg-gray-700/80 transition-all duration-200 font-medium border border-white/10"
-                style={{ position: 'relative', zIndex: 10 }}
-              >
-                <Share2 size={20} />
-                Share
-              </button>
-            </div>
-          </div>
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Your perfect movies for tonight</h1>
-            <p className="text-white/70">Perfect for your {duration}min watch time</p>
+            <h1 className="text-4xl font-bold text-white mt-15 mb-2">Your perfect movies for tonight</h1>
+            <p className="text-white/70">Perfect for your {duration} min watch time</p>
           </div>
           {loading && (
             <div className="flex justify-center items-center py-20">
@@ -401,7 +408,7 @@ export default function ReelaxApp() {
                           )}
                           {rec.runtime && (
                             <div className="flex items-center gap-2">
-                              <Clock size={14} className="text-blue-400" />
+                              <Clock size={14} className="text-white" color="#fff" />
                               <span className="text-sm text-white">{rec.runtime} min</span>
                             </div>
                           )}
@@ -537,6 +544,16 @@ export default function ReelaxApp() {
           -webkit-line-clamp: 2;
           -webkit-box-orient: vertical;
           overflow: hidden;
+        }
+        @media (max-width: 480px) {
+          .startover-btn, .share-btn {
+            padding-left: 0.5rem !important;
+            padding-right: 0.5rem !important;
+            min-width: 0;
+          }
+          .btn-text {
+            display: none;
+          }
         }
       `}</style>
     </div>
