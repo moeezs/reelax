@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from "react";
+import { Suspense, useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Clock, Star, Moon, Share2, ArrowLeft, Edit3, Youtube } from "lucide-react";
 import InfoPanel from "@/components/InfoPanel";
@@ -21,7 +21,7 @@ interface Show {
 
 const genres = ["Action", "Comedy", "Drama", "Horror", "Romance", "Sci-Fi"];
 
-export default function ReelaxApp() {
+function ReelaxApp() {
   const [step, setStep] = useState(0);
   const [genre, setGenre] = useState("");
   const [sleepTime, setSleepTime] = useState("");
@@ -561,5 +561,13 @@ export default function ReelaxApp() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <ReelaxApp />
+    </Suspense>
   );
 }
