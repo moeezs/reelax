@@ -6,7 +6,7 @@ import { Clock, Star, Moon, Share2, ArrowLeft, Edit3, Youtube } from "lucide-rea
 import InfoPanel from "@/components/InfoPanel";
 import Image from "next/image";
 
-const CLAUDE_FONT = "Fira Code, Fira Mono, Menlo, Consolas, DejaVu Sans Mono, sans-serif";
+const FONT_FAMILY = "Menlo, Consolas, DejaVu Sans Mono, sans-serif";
 
 interface Show {
   name: string;
@@ -62,7 +62,7 @@ export default function ReelaxApp() {
     const params = new URLSearchParams();
     if (genre) params.append('genre', genre);
     if (duration) params.append('duration', String(duration));
-    // Restrict to US and similar countries
+
     params.append('region', 'US');
     params.append('with_original_language', 'en');
     const url = `/api/getrecs?${params.toString()}`;
@@ -155,7 +155,7 @@ export default function ReelaxApp() {
       className="min-h-screen flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden"
       style={{ 
         background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)",
-        fontFamily: CLAUDE_FONT 
+        fontFamily: FONT_FAMILY,
       }}
     >
       <div className="w-full flex justify-center mb-6">
@@ -164,12 +164,6 @@ export default function ReelaxApp() {
       <div className="absolute top-20 left-10 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-400/20 rounded-full blur-2xl" />
-      {/* Branding */}
-      <div className="absolute top-6 left-8 z-50 flex flex-col items-start text-left pointer-events-none select-none">
-        <span className="text-white text-xl font-bold tracking-wide">Reelax</span>
-        <span className="text-white/70 text-sm">scatter by moeez</span>
-      </div>
-      {/* Step Counter - only show before final step */}
       {step < totalSteps && (
         <div className="absolute top-6 right-8 z-40 flex justify-end items-center h-12">
           {[...Array(totalSteps)].map((_, i) => (
@@ -180,7 +174,7 @@ export default function ReelaxApp() {
           ))}
         </div>
       )}
-      {/* Start Over & Share buttons take step counter place on final step */}
+
       {step === totalSteps && (
         <div className="absolute top-6 right-8 z-40 flex gap-4 items-center h-12">
           <button

@@ -64,7 +64,11 @@ export default function InfoPanel() {
 
   return (
     <>
-      {/* Floating Info Button */}
+      <div className="absolute top-6 left-8 z-50 flex flex-col items-start text-left pointer-events-none select-none">
+        <span className="text-white text-xl font-bold tracking-wide">Reelax</span>
+        <span className="text-white/70 text-sm">scatter by moeez</span>
+      </div>
+
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-lg"
