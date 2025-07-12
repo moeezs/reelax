@@ -11,7 +11,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'TMDB API key missing' }, { status: 500 });
   }
 
-  // Handle movie details request
   if (movieId) {
     const url = `https://api.themoviedb.org/3/movie/${movieId}?api_key=${TMDB_API_KEY}`;
     try {
@@ -26,7 +25,6 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  // Handle recommendations request
   const genreMap: Record<string, number> = {
     Action: 28,
     Comedy: 35,
@@ -57,7 +55,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'No results from TMDB' }, { status: 500 });
     }
 
-    // Get detailed info for each movie
     const moviesWithDetails = await Promise.all(
       data.results.slice(0, 6).map(async (movie: any) => {
         try {

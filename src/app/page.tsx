@@ -2,20 +2,11 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { Link2, Clock, Star, Play, Moon, Zap, Heart, Share2, ArrowLeft, Edit3, Youtube } from "lucide-react";
+import { Clock, Star, Moon, Share2, ArrowLeft, Edit3, Youtube } from "lucide-react";
 import InfoPanel from "@/components/InfoPanel";
+import Image from "next/image";
 
 const CLAUDE_FONT = "Fira Code, Fira Mono, Menlo, Consolas, DejaVu Sans Mono, sans-serif";
-
-const moodGenreMap: Record<string, number[]> = {
-  Chill: [35, 10749],
-  Excited: [28, 12],
-  Thoughtful: [18, 99],
-  Funny: [35],
-  Spooky: [27, 53],
-  Romantic: [10749],
-};
 
 interface Show {
   name: string;
@@ -59,7 +50,7 @@ export default function ReelaxApp() {
         duration: Number(durationParam),
       });
     }
-  }, []);
+  }, [searchParams]);
 
   const totalSteps = 4;
 
@@ -385,10 +376,12 @@ export default function ReelaxApp() {
                     <div className="flex h-48">
                       {rec.image?.medium && (
                         <div className="flex-shrink-0 w-32 mr-6">
-                          <img 
+                          <Image 
                             src={rec.image.medium} 
                             alt={rec.name} 
+                            width={128} height={192}
                             className="w-full h-full object-cover rounded-xl shadow-md"
+                            unoptimized
                           />
                         </div>
                       )}
@@ -437,10 +430,12 @@ export default function ReelaxApp() {
                 <div className="relative w-full max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-[#1e293b]/80 via-[#334155]/80 to-[#0f172a]/80 border border-white/20 shadow-2xl flex flex-row overflow-hidden" onClick={e => e.stopPropagation()}>
                   <div className="flex-shrink-0 w-[400px] flex items-center justify-center p-8">
                     {recommendations[openMovieIdx].image?.medium && (
-                      <img 
+                      <Image 
                         src={recommendations[openMovieIdx].image.medium} 
                         alt={recommendations[openMovieIdx].name} 
+                        width={320} height={480}
                         className="w-80 h-[480px] object-cover rounded-2xl shadow-xl border-4 border-white/20 mx-auto"
+                        unoptimized
                       />
                     )}
                   </div>
