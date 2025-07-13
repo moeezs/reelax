@@ -27,11 +27,25 @@ export async function GET(req: NextRequest) {
 
   const genreMap: Record<string, number> = {
     Action: 28,
+    Adventure: 12,
+    Animation: 16,
     Comedy: 35,
+    Crime: 80,
+    Documentary: 99,
     Drama: 18,
+    Family: 10751,
+    Fantasy: 14,
+    History: 36,
     Horror: 27,
+    Music: 10402,
+    Mystery: 9648,
     Romance: 10749,
+    'Science Fiction': 878,
     'Sci-Fi': 878,
+    'TV Movie': 10770,
+    Thriller: 53,
+    War: 10752,
+    Western: 37,
   };
   const genreId = genre && genreMap[genre] ? genreMap[genre] : undefined;
 
@@ -43,6 +57,9 @@ export async function GET(req: NextRequest) {
   params.append('sort_by', 'popularity.desc');
   params.append('include_adult', 'false');
   params.append('language', 'en-US');
+  params.append('with_original_language', 'en');
+  params.append('region', 'US');
+  params.append('with_origin_country', 'US');
   url += params.toString();
 
   try {
