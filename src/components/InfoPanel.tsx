@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 
 type TabKey = 'what' | 'how' | 'why' | 'other';
@@ -30,66 +31,110 @@ export default function InfoPanel() {
 
   const info: Record<TabKey, { title: string; body: string[] }> = {
     what: {
-      title: 'What is Reelax?',
+      title: 'What is Reelax? 🎬',
       body: [
-        'Reelax is a personalized movie recommendation engine that helps you find the perfect film based on your mood, available time, and sleep schedule. No more endless scrolling through streaming platforms.',
-        "Simply tell us your preferred genre, when you want to sleep, and how long you want to watch. We'll find movies that fit perfectly into your evening routine.",
+        'Reelax is a personalized movie recommendation engine built for the Scatter project - where we create a fun new app every week! 🚀',
+        "Simply tell us your preferred genre, when you want to sleep, and how long you want to watch. We'll find movies that fit perfectly into your evening routine, so you can relax without the stress of choosing!",
       ],
     },
     how: {
-      title: 'How it works',
+      title: 'How it works ⚡',
       body: [
-        'Our system uses The Movie Database (TMDB) API to fetch high-quality movie data and recommendations. We filter results based on your preferences and calculate optimal viewing times.',
-        'Built with Next.js, TypeScript, and Tailwind CSS for a fast, responsive experience. Movie data is fetched server-side to ensure security and performance.',
+        'Our system uses The Movie Database (TMDB) API to fetch high-quality movie data and smart recommendations. We filter results based on your preferences and calculate optimal viewing times that work with your sleep schedule.',
+        'Built with Next.js, TypeScript, Framer Motion for smooth animations, and Tailwind CSS for a fast, responsive experience. All movie data is fetched securely to ensure privacy and performance.',
       ],
     },
     why: {
-      title: 'Why we built this',
+      title: 'Why we built this 💡',
       body: [
-        'Decision fatigue is real, especially after a long day. We wanted to create a tool that removes the stress of choosing what to watch and helps you stick to healthy sleep schedules.',
-        'By considering your sleep time and available viewing window, Reelax ensures you can enjoy a great movie without sacrificing rest.',
+        'Part of the Scatter project where we ship creative apps weekly! Decision fatigue is real, especially after a long day. We wanted to create a tool that removes the stress of choosing what to watch.',
+        'By considering your sleep time and available viewing window, Reelax ensures you can enjoy a great movie without sacrificing rest. Perfect for those "I just want to relax but can\'t decide what to watch" moments!',
       ],
     },
     other: {
-      title: 'More info',
+      title: 'About Scatter 🌟',
       body: [
-        'This project was built as a demonstration of modern web development practices, combining user experience design with practical functionality.',
-        'Data is sourced from TMDB and no personal information is stored. Share links contain only your preferences in the URL parameters.',
+        'Scatter is our weekly app challenge where we build and ship fun, useful apps every single week. Each app tackles a different problem or explores new creative ideas!',
+        'From productivity tools to entertainment apps like Reelax, we\'re always experimenting with new concepts. Follow our journey as we scatter creative solutions across the web, one app at a time!',
+        'Want to see what we build next? Check out our other Scatter apps and join the fun! 🎉',
       ],
     },
   };
 
   return (
-    <div style={{ fontFamily: 'Menlo, monospace' }}>
+    <motion.div 
+      style={{ fontFamily: 'Menlo, monospace' }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+    >
       <div className="absolute top-6 left-8 z-50 flex flex-col items-start text-left pointer-events-none select-none">
-        <span className="text-white text-xl font-bold tracking-wide">Reelax</span>
-        <span className="text-white/70 text-sm">scatter by moeez</span>
+        <motion.span 
+          className="text-white text-xl font-bold tracking-wide"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          Reelax
+        </motion.span>
+        <motion.span 
+          className="text-white/70 text-sm"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          scatter by moeez
+        </motion.span>
       </div>
 
-      <button
+      <motion.button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 z-50 w-12 h-12 rounded-full backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/20 transition-all duration-300 flex items-center justify-center group shadow-lg"
         style={{
           backdropFilter: 'blur(20px) saturate(180%)',
           WebkitBackdropFilter: 'blur(20px) saturate(180%)',
         }}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8, duration: 0.5 }}
       >
-        <span className="text-white font-medium text-lg group-hover:scale-110 transition-transform">i</span>
-      </button>
+        <motion.span 
+          className="text-white font-medium text-lg transition-transform"
+          whileHover={{ scale: 1.1 }}
+        >
+          i
+        </motion.span>
+      </motion.button>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setIsOpen(false)}
-          />
-          <div 
-            className="relative w-full max-w-2xl max-h-[80vh] rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl overflow-hidden"
-            style={{
-              backdropFilter: 'blur(20px) saturate(180%)',
-              WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-            }}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
           >
+            <motion.div 
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setIsOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            />
+            <motion.div 
+              className="relative w-full max-w-2xl max-h-[80vh] rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-2xl overflow-hidden"
+              style={{
+                backdropFilter: 'blur(20px) saturate(180%)',
+                WebkitBackdropFilter: 'blur(20px) saturate(180%)',
+              }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
             <div className="border-b border-white/20">
               <div className="flex items-center justify-between p-6 pb-0">
                 <h2 className="text-2xl font-bold text-white">Info</h2>
@@ -129,9 +174,10 @@ export default function InfoPanel() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

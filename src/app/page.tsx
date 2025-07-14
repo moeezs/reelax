@@ -2,7 +2,8 @@
 
 import { Suspense, useState, useEffect, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Clock, Star, Moon, Share2, ArrowLeft, Edit3, Youtube } from "lucide-react";
+import { Clock, Star, Moon, Share2, ArrowLeft, Edit3, Youtube, RefreshCw } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import InfoPanel from "@/components/InfoPanel";
 import Image from "next/image";
 
@@ -155,7 +156,10 @@ function ReelaxApp() {
   }
 
   return (
-    <div 
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
       className="min-h-screen flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden"
       style={{ 
         background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)",
@@ -180,204 +184,382 @@ function ReelaxApp() {
       )}
 
       {step === totalSteps && (
-        <div className="absolute top-6 right-8 z-40 flex gap-4 items-center h-12">
-          <button
+        <motion.div 
+          className="absolute top-6 right-8 z-40 flex gap-4 items-center h-12"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.4 }}
+        >
+          <motion.button
             onClick={() => { setStep(0); router.push("/"); }}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium"
             style={{ position: 'relative', zIndex: 10 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <ArrowLeft size={20} />
             <span className="hidden sm:inline">Start Over</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={() => setShowShare(true)}
             className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-800/70 text-white hover:bg-gray-700/80 transition-all duration-200 font-medium border border-white/10"
             style={{ position: 'relative', zIndex: 10 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Share2 size={20} />
             <span className="hidden sm:inline">Share</span>
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
       {step === 0 && (
-        <div className="text-center max-w-md mx-auto px-6 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-md mx-auto px-6"
+        >
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">What type of movie?</h1>
             <p className="text-white/70 text-sm">Choose your preferred genre</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            {(showAllGenres ? allGenres : initialGenres).map((g) => (
-              <button
+          <motion.div 
+            className="grid grid-cols-2 gap-3 mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            {(showAllGenres ? allGenres : initialGenres).map((g, index) => (
+              <motion.button
                 key={g}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 * index, duration: 0.3 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 className={`p-4 rounded-xl font-medium transition-all duration-200 ${genre === g ? "bg-white text-gray-900 shadow-lg scale-105" : "bg-white/10 text-white border border-white/20 hover:bg-white/20"}`}
                 onClick={() => setGenre(g)}
               >
                 {g}
-              </button>
+              </motion.button>
             ))}
-          </div>
-          {!showAllGenres && (
-            <div className="flex justify-center mb-4">
-              <button
-                className="text-white/50 text-xs underline font-normal lowercase tracking-wide bg-none border-none shadow-none focus:outline-none"
-                onClick={() => setShowAllGenres(true)}
+          </motion.div>
+          <AnimatePresence>
+            {!showAllGenres && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="flex justify-center mb-4"
               >
-                view more
-              </button>
-            </div>
-          )}
-          <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-white/50 text-xs underline font-normal lowercase tracking-wide bg-none border-none shadow-none focus:outline-none"
+                  onClick={() => setShowAllGenres(true)}
+                >
+                  view more
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.button
+            whileHover={{ scale: genre ? 1.02 : 1 }}
+            whileTap={{ scale: genre ? 0.98 : 1 }}
             className={`px-8 py-3 rounded-xl font-medium transition-all duration-200 ${genre ? "bg-white text-gray-900 shadow-lg hover:shadow-xl" : "bg-white/20 text-white/50 cursor-not-allowed"}`}
             disabled={!genre}
             onClick={() => setStep(1)}
           >
             Next
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
       {step === 1 && (
-        <div className="text-center max-w-md mx-auto px-6 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-md mx-auto px-6"
+        >
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">When do you want to sleep?</h1>
             <p className="text-white/70 text-sm">We'll find content that fits your schedule</p>
           </div>
-          <div className="mb-8">
-            <input
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <motion.input
               ref={timeRef}
               type="time"
               value={sleepTime}
               onChange={e => setSleepTime(e.target.value)}
               className="w-full p-4 rounded-xl bg-white/10 border border-white/20 text-white text-center text-xl font-mono"
               placeholder={getCurrentTimePlusOne()}
+              whileFocus={{ scale: 1.02 }}
             />
-            {sleepTime && (
-              <div className="mt-4 text-white/70 text-sm">
-                Available time: {getAvailableMinutes()} minutes
-              </div>
-            )}
-          </div>
-          <button
+            <AnimatePresence>
+              {sleepTime && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="mt-4 text-white/70 text-sm"
+                >
+                  Available time: {getAvailableMinutes()} minutes
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+          <motion.button
+            whileHover={{ scale: sleepTime ? 1.02 : 1 }}
+            whileTap={{ scale: sleepTime ? 0.98 : 1 }}
             className={`px-8 py-3 rounded-xl font-medium transition-all duration-200 ${sleepTime ? "bg-white text-gray-900 shadow-lg hover:shadow-xl" : "bg-white/20 text-white/50 cursor-not-allowed"}`}
             disabled={!sleepTime}
             onClick={() => { setDuration(getAvailableMinutes()); setStep(2); }}
           >
             Next
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
       {step === 2 && (
-        <div className="text-center max-w-md mx-auto px-6 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-md mx-auto px-6"
+        >
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">How long do you want to watch?</h1>
             <p className="text-white/70 text-sm">Based on your sleep time</p>
           </div>
-          <div className="mb-8">
-            <input
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
+            <motion.input
               type="range"
               min={30}
               max={getAvailableMinutes()}
               value={duration}
               onChange={e => setDuration(Number(e.target.value))}
               className="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer"
+              whileHover={{ scale: 1.01 }}
             />
-            <div className="text-2xl font-bold text-white mt-4">{duration} minutes</div>
-            <div className="text-white/70 text-sm mt-2">
+            <motion.div 
+              className="text-2xl font-bold text-white mt-4"
+              key={duration}
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.2 }}
+            >
+              {duration} minutes
+            </motion.div>
+            <motion.div 
+              className="text-white/70 text-sm mt-2"
+              key={getBedtime(duration)}
+              initial={{ opacity: 0.5 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
               You'll finish by {getBedtime(duration)}
-            </div>
-          </div>
-          <button
+            </motion.div>
+          </motion.div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="px-8 py-3 rounded-xl font-medium bg-white text-gray-900 shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={() => setStep(3)}
           >
             Next
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
       {step === 3 && (
-        <div className="text-center max-w-md mx-auto px-6 animate-fade-in">
+        <motion.div
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="text-center max-w-md mx-auto px-6"
+        >
           <div className="mb-8">
             <h1 className="text-3xl font-bold text-white mb-2">Review your preferences</h1>
             <p className="text-white/70 text-sm">Make sure everything looks right before we find your perfect movie</p>
           </div>
-          <div className="bg-white/10 rounded-2xl p-6 mb-8 border border-white/20">
+          <motion.div 
+            className="bg-white/10 rounded-2xl p-6 mb-8 border border-white/20"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
+          >
             <div className="space-y-4">
-              <div className="flex justify-between items-center">
+              <motion.div 
+                className="flex justify-between items-center"
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
                 <span className="text-white/70">Genre:</span>
                 <div className="flex items-center gap-2">
                   <span className="text-white font-medium">{genre}</span>
-                  <button
+                  <motion.button
                     onClick={() => setStep(0)}
                     className="p-1 rounded hover:bg-white/20 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <Edit3 size={16} className="text-white/70" />
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
+              </motion.div>
+              <motion.div 
+                className="flex justify-between items-center"
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
                 <span className="text-white/70">Sleep by:</span>
                 <div className="flex items-center gap-2">
                   <span className="text-white font-medium">{sleepTime}</span>
-                  <button
+                  <motion.button
                     onClick={() => setStep(1)}
                     className="p-1 rounded hover:bg-white/20 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <Edit3 size={16} className="text-white/70" />
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
-              <div className="flex justify-between items-center">
+              </motion.div>
+              <motion.div 
+                className="flex justify-between items-center"
+                whileHover={{ x: 2 }}
+                transition={{ duration: 0.2 }}
+              >
                 <span className="text-white/70">Watch time:</span>
                 <div className="flex items-center gap-2">
                   <span className="text-white font-medium">{duration} minutes</span>
-                  <button
+                  <motion.button
                     onClick={() => setStep(2)}
                     className="p-1 rounded hover:bg-white/20 transition-colors"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <Edit3 size={16} className="text-white/70" />
-                  </button>
+                  </motion.button>
                 </div>
-              </div>
+              </motion.div>
               <div className="flex justify-between items-center">
                 <span className="text-white/70">Finish by:</span>
                 <span className="text-white font-medium">{getBedtime(duration)}</span>
               </div>
             </div>
-          </div>
-          <button
+          </motion.div>
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             className="px-8 py-3 rounded-xl font-medium bg-white text-gray-900 shadow-lg hover:shadow-xl transition-all duration-200"
             onClick={() => { getMovieRecommendations(); setStep(4); }}
           >
             Find My Perfect Movie
-          </button>
-        </div>
+          </motion.button>
+        </motion.div>
       )}
       {step === 4 && (
-        <div className="w-full max-w-6xl mx-auto px-6 py-8 animate-fade-in pt-8">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          className="w-full max-w-6xl mx-auto px-6 py-8 pt-8"
+        >
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mt-15 mb-2">Your perfect movies for tonight</h1>
-            <p className="text-white/70">Perfect for your {duration} min watch time</p>
+            <motion.h1 
+              className="text-4xl font-bold text-white mt-15 mb-2"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              Your perfect movies for tonight
+            </motion.h1>
+            <motion.p 
+              className="text-white/70"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              Perfect for your {duration} min watch time
+            </motion.p>
+            <motion.button
+              onClick={getMovieRecommendations}
+              className="mt-4 flex items-center gap-2 mx-auto px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium border border-white/20"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.4 }}
+            >
+              <RefreshCw size={16} />
+              <span className="text-sm">Get New Recommendations</span>
+            </motion.button>
           </div>
-          {loading && (
-            <div className="flex justify-center items-center py-20">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
-            </div>
-          )}
-          {!loading && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {recommendations.length === 0 ? (
-                <div className="col-span-full text-center py-20">
-                  <div className="text-white/70 text-lg mb-4">No matches found</div>
-                  <button
-                    onClick={() => setStep(0)}
-                    className="px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-200"
+          <AnimatePresence mode="wait">
+            {loading && (
+              <motion.div 
+                className="flex justify-center items-center py-20"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div 
+                  className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {!loading && (
+              <motion.div 
+                className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+              >
+                {recommendations.length === 0 ? (
+                  <motion.div 
+                    className="col-span-full text-center py-20"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
                   >
-                    Try different preferences
-                  </button>
-                </div>
-              ) : (
+                    <div className="text-white/70 text-lg mb-4">No matches found</div>
+                    <motion.button
+                      onClick={() => setStep(0)}
+                      className="px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-200"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Try different preferences
+                    </motion.button>
+                  </motion.div>
+                ) : (
                 recommendations.map((rec, i) => (
-                  <div
-                    key={i}
+                  <motion.div
+                    key={`${rec.name}-${i}`}
+                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
+                    whileHover={{ scale: 1.02, y: -5 }}
                     className="group relative bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden shadow-lg p-6 flex flex-col min-h-[220px]"
                     onClick={() => setOpenMovieIdx(i)}
                   >
@@ -432,21 +614,34 @@ function ReelaxApp() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))
               )}
-            </div>
+            </motion.div>
           )}
+          </AnimatePresence>
           {/* Custom Glass Dialog for Movie Info */}
-          {openMovieIdx !== null && recommendations[openMovieIdx] && (
-            <>
-              <style>{`body { overflow: hidden !important; }`}</style>
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#162032]/80 backdrop-blur-sm" onClick={() => setOpenMovieIdx(null)}>
-                <div
-                  className="relative w-full max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-[#1e293b]/80 via-[#334155]/80 to-[#0f172a]/80 border border-white/20 shadow-2xl flex flex-col overflow-hidden"
-                  onClick={e => e.stopPropagation()}
-                  style={{ maxHeight: '90vh' }}
-                >
+      <AnimatePresence>
+        {openMovieIdx !== null && recommendations[openMovieIdx] && (
+          <>
+            <style>{`body { overflow: hidden !important; }`}</style>
+            <motion.div 
+              className="fixed inset-0 z-50 flex items-center justify-center bg-[#162032]/80 backdrop-blur-sm" 
+              onClick={() => setOpenMovieIdx(null)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <motion.div
+                className="relative w-full max-w-5xl mx-auto rounded-3xl bg-gradient-to-br from-[#1e293b]/80 via-[#334155]/80 to-[#0f172a]/80 border border-white/20 shadow-2xl flex flex-col overflow-hidden"
+                onClick={e => e.stopPropagation()}
+                style={{ maxHeight: '90vh' }}
+                initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                transition={{ duration: 0.3, ease: "easeOut" }}
+              >
                   {/* Desktop layout */}
                   <div className="hidden md:flex flex-row w-full justify-center items-start px-6 pt-8 pb-4 gap-8">
                     <div className="flex-shrink-0 flex items-center justify-center" style={{ height: '100%' }}>
@@ -571,42 +766,62 @@ function ReelaxApp() {
                   >
                     ×
                   </button>
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             </>
           )}
-          {/* Custom Glass Dialog for Share */}
-          {showShare && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-              <div className="relative w-full max-w-lg mx-auto rounded-3xl bg-gradient-to-br from-[#1e293b]/80 via-[#334155]/80 to-[#0f172a]/80 border border-white/20 shadow-2xl p-10 flex flex-col items-center" onClick={e => e.stopPropagation()}>
-                <h2 className="text-2xl font-bold text-white mb-2">Share your picks</h2>
-                <p className="text-gray-300 mb-4">Send this link to share your recommendations.</p>
-                <div className="bg-gray-800/60 p-3 rounded-lg font-mono text-sm text-blue-200 break-all w-full mb-4">
-                  {typeof window !== "undefined" ? window.location.href : ""}
-                </div>
-                <button
-                  className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-200 ${copied ? "bg-green-500 text-white" : "bg-white/30 text-white hover:bg-white/40"}`}
-                  onClick={() => {
-                    if (typeof window !== "undefined") {
-                      navigator.clipboard.writeText(window.location.href);
-                      setCopied(true);
-                      setTimeout(() => setCopied(false), 1200);
-                    }
-                  }}
-                >
-                  {copied ? "Copied!" : "Copy link"}
-                </button>
-                <button
-                  className="absolute top-6 right-6 text-white/70 hover:text-white text-2xl"
-                  onClick={() => { setShowShare(false); setCopied(false); }}
-                  aria-label="Close"
-                >
-                  ×
-                </button>
+      </AnimatePresence>
+      {/* Custom Glass Dialog for Share */}
+      <AnimatePresence>
+        {showShare && (
+          <motion.div 
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="relative w-full max-w-lg mx-auto rounded-3xl bg-gradient-to-br from-[#1e293b]/80 via-[#334155]/80 to-[#0f172a]/80 border border-white/20 shadow-2xl p-10 flex flex-col items-center" 
+              onClick={e => e.stopPropagation()}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <h2 className="text-2xl font-bold text-white mb-2">Share your picks</h2>
+              <p className="text-gray-300 mb-4">Send this link to share your recommendations.</p>
+              <div className="bg-gray-800/60 p-3 rounded-lg font-mono text-sm text-blue-200 break-all w-full mb-4">
+                {typeof window !== "undefined" ? window.location.href : ""}
               </div>
-            </div>
-          )}
-        </div>
+              <motion.button
+                className={`w-full px-4 py-2 rounded-lg font-medium transition-all duration-200 ${copied ? "bg-green-500 text-white" : "bg-white/30 text-white hover:bg-white/40"}`}
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    navigator.clipboard.writeText(window.location.href);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1200);
+                  }
+                }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {copied ? "Copied!" : "Copy link"}
+              </motion.button>
+              <motion.button
+                className="absolute top-6 right-6 text-white/70 hover:text-white text-2xl"
+                onClick={() => { setShowShare(false); setCopied(false); }}
+                aria-label="Close"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                ×
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+        </motion.div>
       )}
       <style jsx>{`
         @keyframes fade-in {
@@ -633,7 +848,7 @@ function ReelaxApp() {
           }
         }
       `}</style>
-    </div>
+    </motion.div>
   );
 }
 
