@@ -89,9 +89,8 @@ export async function GET(req: NextRequest) {
     );
 
     const filtered = moviesWithDetails.filter(
-      (m: any) => m.poster_path && m.overview && m.runtime
+      (m: any) => m.poster_path && m.overview && m.runtime && (!duration || m.runtime <= Number(duration))
     );
-    
     return NextResponse.json({ results: filtered });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch recommendations' }, { status: 500 });

@@ -19,9 +19,13 @@ interface Show {
   uniqueStyle?: React.CSSProperties;
 }
 
-const genres = ["Action", "Comedy", "Drama", "Horror", "Romance", "Sci-Fi"];
+const initialGenres = ["Action", "Comedy", "Drama", "Horror", "Romance", "Sci-Fi"];
+const allGenres = [
+  "Action", "Adventure", "Animation", "Comedy", "Crime", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Science Fiction", "Sci-Fi", "Thriller", "Documentary"
+];
 
 function ReelaxApp() {
+  const [showAllGenres, setShowAllGenres] = useState(false);
   const [step, setStep] = useState(0);
   const [genre, setGenre] = useState("");
   const [sleepTime, setSleepTime] = useState("");
@@ -201,8 +205,8 @@ function ReelaxApp() {
             <h1 className="text-3xl font-bold text-white mb-2">What type of movie?</h1>
             <p className="text-white/70 text-sm">Choose your preferred genre</p>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-8">
-            {genres.map((g) => (
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            {(showAllGenres ? allGenres : initialGenres).map((g) => (
               <button
                 key={g}
                 className={`p-4 rounded-xl font-medium transition-all duration-200 ${genre === g ? "bg-white text-gray-900 shadow-lg scale-105" : "bg-white/10 text-white border border-white/20 hover:bg-white/20"}`}
@@ -212,6 +216,16 @@ function ReelaxApp() {
               </button>
             ))}
           </div>
+          {!showAllGenres && (
+            <div className="flex justify-center mb-4">
+              <button
+                className="text-white/50 text-xs underline font-normal lowercase tracking-wide bg-none border-none shadow-none focus:outline-none"
+                onClick={() => setShowAllGenres(true)}
+              >
+                view more
+              </button>
+            </div>
+          )}
           <button
             className={`px-8 py-3 rounded-xl font-medium transition-all duration-200 ${genre ? "bg-white text-gray-900 shadow-lg hover:shadow-xl" : "bg-white/20 text-white/50 cursor-not-allowed"}`}
             disabled={!genre}
@@ -433,11 +447,68 @@ function ReelaxApp() {
                   onClick={e => e.stopPropagation()}
                   style={{ maxHeight: '90vh' }}
                 >
-                  {/* Top row: poster and info boxes */}
-                  <div className="flex flex-row w-full justify-center">
-                    {/* Poster left */}
-                    <div className="flex-shrink-0 flex items-center justify-center p-4" style={{ height: '100%' }}>
+                  {/* Desktop layout */}
+                  <div className="hidden md:flex flex-row w-full justify-center items-start px-6 pt-8 pb-4 gap-8">
+                    <div className="flex-shrink-0 flex items-center justify-center" style={{ height: '100%' }}>
                       {recommendations[openMovieIdx].image?.medium && (
+                        <Image
+                          src={recommendations[openMovieIdx].image.medium}
+                          alt={recommendations[openMovieIdx].name}
+                          width={180} height={270}
+                          className="w-44 h-72 object-cover rounded-2xl shadow-xl border-4 border-white/20 mx-auto"
+                          unoptimized
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 flex flex-col items-start justify-start">
+                      <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 w-full">
+                        <h2 className="text-3xl font-bold text-white mb-0">{recommendations[openMovieIdx].name}</h2>
+                        {recommendations[openMovieIdx].release && (
+                          <span className="text-white/60 text-lg">{recommendations[openMovieIdx].release}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-row gap-4 mt-4 mb-4">
+                        {recommendations[openMovieIdx].rating && (
+                          <div className="flex flex-col items-center justify-center px-4 py-3 rounded-xl bg-white/20 shadow min-w-[90px]">
+                            <span className="text-white text-lg font-semibold">{Number(recommendations[openMovieIdx].rating).toFixed(1)}/10</span>
+                            <span className="text-xs text-white/70 mt-1">Rating</span>
+                          </div>
+                        )}
+                        {recommendations[openMovieIdx].runtime && (
+                          <div className="flex flex-col items-center justify-center px-4 py-3 rounded-xl bg-white/20 shadow min-w-[90px]">
+                            <span className="text-white text-lg font-semibold">{recommendations[openMovieIdx].runtime} min</span>
+                            <span className="text-xs text-white/70 mt-1">Duration</span>
+                          </div>
+                        )}
+                        <div className="flex flex-col items-center justify-center px-4 py-3 rounded-xl bg-white/20 shadow min-w-[90px]">
+                          <span className="text-white text-lg font-semibold">{getBedtime(recommendations[openMovieIdx].runtime)}</span>
+                          <span className="text-xs text-white/70 mt-1">Sleep by</span>
+                        </div>
+                      </div>
+                      <button
+                        className="mb-4 px-6 py-3 rounded-xl font-medium bg-white/30 text-white hover:bg-white/40 transition-all duration-200 shadow-lg border border-white/20 flex items-center justify-center gap-3 text-lg w-full max-w-xs"
+                        onClick={() => handleTrailerClick(recommendations[openMovieIdx].name)}
+                        title="Watch Trailer"
+                      >
+                        <Youtube size={24} /> <span>Watch Trailer</span>
+                      </button>
+                      {recommendations[openMovieIdx].summary && (
+                        <>
+                          <h3 className="font-semibold mb-2 text-lg text-white">Synopsis</h3>
+                          <div className="max-h-56 overflow-y-auto pr-2 w-full">
+                            <p className="text-white/80 leading-relaxed text-base">
+                              {recommendations[openMovieIdx].summary}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className="md:hidden w-full px-4 pb-4 flex flex-col items-center justify-start">
+                    {/* Poster at top */}
+                    {recommendations[openMovieIdx].image?.medium && (
+                      <div className="w-full max-w-md mx-auto mt-6 flex">
+                      <div className="flex items-center justify-center w-full mb-4">
                         <Image
                           src={recommendations[openMovieIdx].image.medium}
                           alt={recommendations[openMovieIdx].name}
@@ -445,31 +516,33 @@ function ReelaxApp() {
                           className="w-40 h-60 object-cover rounded-2xl shadow-xl border-4 border-white/20 mx-auto"
                           unoptimized
                         />
-                      )}
-                    </div>
-                    {/* Info boxes stacked vertically, same height as poster */}
-                    <div className="flex flex-col justify-between py-4 h-60 w-32 gap-4">
+                      </div>
+                      <div className="flex flex-col gap-3 w-full justify-start mb-4 my-auto">
                       {recommendations[openMovieIdx].rating && (
-                        <div className="flex flex-col items-center justify-center px-3 py-4 rounded-xl bg-white/20 shadow h-1/3">
-                          <span className="text-white text-lg font-semibold">{Number(recommendations[openMovieIdx].rating).toFixed(1)}/10</span>
+                        <div className="flex flex-col items-center justify-center px-3 py-2 rounded-xl bg-white/20 shadow min-w-[70px]">
+                          <span className="text-white text-base font-semibold">{Number(recommendations[openMovieIdx].rating).toFixed(1)}/10</span>
                           <span className="text-xs text-white/70 mt-1">Rating</span>
                         </div>
+                        
                       )}
                       {recommendations[openMovieIdx].runtime && (
-                        <div className="flex flex-col items-center justify-center px-3 py-4 rounded-xl bg-white/20 shadow h-1/3">
-                          <span className="text-white text-lg font-semibold">{recommendations[openMovieIdx].runtime} min</span>
+                        <div className="flex flex-col items-center justify-center px-3 py-2 rounded-xl bg-white/20 shadow min-w-[70px]">
+                          <span className="text-white text-base font-semibold">{recommendations[openMovieIdx].runtime} min</span>
                           <span className="text-xs text-white/70 mt-1">Duration</span>
                         </div>
                       )}
-                      <div className="flex flex-col items-center justify-center px-3 py-4 rounded-xl bg-white/20 shadow h-1/3">
-                        <span className="text-white text-lg font-semibold">{getBedtime(recommendations[openMovieIdx].runtime)}</span>
+                      <div className="flex flex-col items-center justify-center px-3 py-2 rounded-xl bg-white/20 shadow min-w-[70px]">
+                        <span className="text-white text-base font-semibold">{getBedtime(recommendations[openMovieIdx].runtime)}</span>
                         <span className="text-xs text-white/70 mt-1">Sleep by</span>
                       </div>
                     </div>
-                  </div>
-                  {/* Below: title, year, trailer, synopsis */}
-                  <div className="w-full px-4 pb-4 flex flex-col items-center justify-start">
-                    <h2 className="text-2xl md:text-4xl font-bold text-white mt-2 mb-1 text-center">{recommendations[openMovieIdx].name}</h2>
+                    </ div>
+
+                    )}
+                    {/* Info boxes in a row */}
+                    
+                    {/* Title, year, trailer, synopsis */}
+                    <h2 className="text-2xl font-bold text-white mt-2 mb-1 text-center">{recommendations[openMovieIdx].name}</h2>
                     {recommendations[openMovieIdx].release && (
                       <p className="text-white/60 mb-2 text-lg text-center">{recommendations[openMovieIdx].release}</p>
                     )}
