@@ -72,8 +72,9 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'No results from TMDB' }, { status: 500 });
     }
 
+    // Get details for more movies to give frontend more options
     const moviesWithDetails = await Promise.all(
-      data.results.slice(0, 6).map(async (movie: any) => {
+      data.results.slice(0, 20).map(async (movie: any) => {
         try {
           const detailsRes = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=${TMDB_API_KEY}`);
           const details = await detailsRes.json();
@@ -91,6 +92,8 @@ export async function GET(req: NextRequest) {
     const filtered = moviesWithDetails.filter(
       (m: any) => m.poster_path && m.overview && m.runtime && (!duration || m.runtime <= Number(duration))
     );
+    
+    // Return all filtered results for frontend to choose from
     return NextResponse.json({ results: filtered });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch recommendations' }, { status: 500 });

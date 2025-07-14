@@ -59,6 +59,12 @@ function ReelaxApp() {
 
   const totalSteps = 4;
 
+  // Function to get 6 random unique movies from array
+  function getRandomMovies(movies: any[], count: number = 6) {
+    const shuffled = [...movies].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
+
   async function fetchTMDBRecommendations({ genre, sleepTime, duration }: {
     genre: string;
     sleepTime: string;
@@ -68,8 +74,6 @@ function ReelaxApp() {
     if (genre) params.append('genre', genre);
     if (duration) params.append('duration', String(duration));
 
-    params.append('region', 'US');
-    params.append('with_original_language', 'en');
     const url = `/api/getrecs?${params.toString()}`;
 
     try {
@@ -79,10 +83,7 @@ function ReelaxApp() {
         console.error('API error:', data);
         return [];
       }
-      // Less restrictive: only filter out adult content
-      return (data.results || []).filter((movie: any) => {
-        return !movie.adult;
-      });
+      return data.results || [];
     } catch (error) {
       console.error('Error fetching recommendations:', error);
       return [];
@@ -92,35 +93,37 @@ function ReelaxApp() {
   async function getMovieRecommendations(paramsOverride?: any) {
     setLoading(true);
     const params = paramsOverride || { genre, sleepTime, duration };
-    const shows = await fetchTMDBRecommendations(params);
-    const parsed = await Promise.all(shows.map(async (movie: any) => {
-      let runtime = movie.runtime;
-      let fullDescription = movie.overview;
-      if ((!runtime || !fullDescription) && movie.id) {
-        try {
-          const detailsRes = await fetch(`/api/getrecs/details?id=${movie.id}`);
-          const details = await detailsRes.json();
-          runtime = details.runtime;
-          fullDescription = details.overview;
-        } catch {}
-      }
-      return {
+    
+    // Only update URL if we have valid params and it's not just a refresh
+    if (params.genre && params.sleepTime && params.duration && !isNaN(params.duration)) {
+      const allMovies = await fetchTMDBRecommendations(params);
+      
+      // Get 6 random movies from the results
+      const selectedMovies = getRandomMovies(allMovies, 6);
+      
+      const parsed = selectedMovies.map((movie: any) => ({
         name: movie.title || movie.original_title,
-        summary: fullDescription,
+        summary: movie.overview,
         image: movie.poster_path ? { medium: `https://image.tmdb.org/t/p/w300${movie.poster_path}` } : undefined,
-        runtime: runtime || undefined,
+        runtime: movie.runtime,
         release: movie.release_date ? movie.release_date.slice(0, 4) : undefined,
         rating: movie.vote_average,
-      };
-    }));
-    setRecommendations(parsed);
+      }));
+      
+      setRecommendations(parsed);
+      
+      // Only update URL if this is the initial load or step navigation, not refresh
+      if (!paramsOverride || (paramsOverride && !recommendations.length)) {
+        const urlParams = new URLSearchParams({
+          genre: params.genre,
+          sleepTime: params.sleepTime,
+          duration: String(params.duration),
+        });
+        router.replace(`?${urlParams.toString()}`);
+      }
+    }
+    
     setLoading(false);
-    const urlParams = new URLSearchParams({
-      genre: params.genre,
-      sleepTime: params.sleepTime,
-      duration: String(params.duration),
-    });
-    router.replace(`?${urlParams.toString()}`);
   }
 
   function getAvailableMinutes() {
@@ -156,19 +159,25 @@ function ReelaxApp() {
   }
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, ease: "easeOut" }}
-      className="min-h-screen flex flex-col items-center justify-center transition-all duration-500 relative overflow-hidden"
+    <div 
+      className="min-h-screen transition-all duration-500 relative"
       style={{ 
         background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)",
+        backgroundAttachment: "fixed",
         fontFamily: FONT_FAMILY,
+        minHeight: "100vh",
       }}
     >
-      <div className="w-full flex justify-center mb-6">
-        <InfoPanel />
-      </div>
+      {/* Scrollable content container */}
+      <motion.div 
+        className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
+        <div className="w-full flex justify-center mb-6">
+          <InfoPanel />
+        </div>
       <div className="absolute top-20 left-10 w-48 h-48 bg-blue-400/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-32 h-32 bg-yellow-400/20 rounded-full blur-3xl" />
       <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-purple-400/20 rounded-full blur-2xl" />
@@ -230,20 +239,30 @@ function ReelaxApp() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.4 }}
           >
-            {(showAllGenres ? allGenres : initialGenres).map((g, index) => (
-              <motion.button
-                key={g}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index, duration: 0.3 }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={`p-4 rounded-xl font-medium transition-all duration-200 ${genre === g ? "bg-white text-gray-900 shadow-lg scale-105" : "bg-white/10 text-white border border-white/20 hover:bg-white/20"}`}
-                onClick={() => setGenre(g)}
-              >
-                {g}
-              </motion.button>
-            ))}
+            {(showAllGenres ? allGenres : initialGenres).map((g, index) => {
+              // Calculate proper stagger delay for both columns
+              const row = Math.floor(index / 2);
+              const staggerDelay = row * 0.06;
+              
+              return (
+                <motion.button
+                  key={g}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ 
+                    delay: staggerDelay,
+                    duration: 0.2,
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`p-4 rounded-xl font-medium transition-all duration-200 ${genre === g ? "bg-white text-gray-900 shadow-lg scale-105" : "bg-white/10 text-white border border-white/20 hover:bg-white/20"}`}
+                  onClick={() => setGenre(g)}
+                >
+                  {g}
+                </motion.button>
+              );
+            })}
           </motion.div>
           <AnimatePresence>
             {!showAllGenres && (
@@ -498,16 +517,22 @@ function ReelaxApp() {
               Perfect for your {duration} min watch time
             </motion.p>
             <motion.button
-              onClick={getMovieRecommendations}
-              className="mt-4 flex items-center gap-2 mx-auto px-4 py-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium border border-white/20"
+              onClick={() => getMovieRecommendations({ genre, sleepTime, duration })}
+              className="mt-4 flex items-center gap-2 mx-auto px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-200 font-medium border border-white/20"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.4 }}
+              disabled={loading}
             >
-              <RefreshCw size={16} />
-              <span className="text-sm">Get New Recommendations</span>
+              <motion.div
+                animate={loading ? { rotate: 360 } : { rotate: 0 }}
+                transition={loading ? { duration: 1, repeat: Infinity, ease: "linear" } : { duration: 0.3 }}
+              >
+                <RefreshCw size={18} />
+              </motion.div>
+              <span>{loading ? "Getting new movies..." : "Get New Movies"}</span>
             </motion.button>
           </div>
           <AnimatePresence mode="wait">
@@ -527,39 +552,22 @@ function ReelaxApp() {
               </motion.div>
             )}
           </AnimatePresence>
-          <AnimatePresence>
-            {!loading && (
+          <AnimatePresence mode="wait">
+            {!loading && recommendations.length > 0 && (
               <motion.div 
-                className="grid grid-cols-1 lg:grid-cols-2 gap-8"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
+                className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
               >
-                {recommendations.length === 0 ? (
-                  <motion.div 
-                    className="col-span-full text-center py-20"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <div className="text-white/70 text-lg mb-4">No matches found</div>
-                    <motion.button
-                      onClick={() => setStep(0)}
-                      className="px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-200"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Try different preferences
-                    </motion.button>
-                  </motion.div>
-                ) : (
-                recommendations.map((rec, i) => (
+                {recommendations.map((rec, i) => (
                   <motion.div
                     key={`${rec.name}-${i}`}
-                    initial={{ opacity: 0, y: 30, scale: 0.9 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: i * 0.1, duration: 0.4, ease: "easeOut" }}
-                    whileHover={{ scale: 1.02, y: -5 }}
+                    whileHover={{ scale: 1.02, y: -2 }}
                     className="group relative bg-white/10 backdrop-blur-sm rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300 cursor-pointer overflow-hidden shadow-lg p-6 flex flex-col min-h-[220px]"
                     onClick={() => setOpenMovieIdx(i)}
                   >
@@ -615,10 +623,27 @@ function ReelaxApp() {
                       </div>
                     </div>
                   </motion.div>
-                ))
-              )}
-            </motion.div>
-          )}
+                ))}
+              </motion.div>
+            )}
+            {!loading && recommendations.length === 0 && (
+              <motion.div 
+                className="text-center py-20"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="text-white/70 text-lg mb-4">No matches found</div>
+                <motion.button
+                  onClick={() => setStep(0)}
+                  className="px-6 py-3 rounded-xl bg-white/10 text-white hover:bg-white/20 transition-all duration-200"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Try different preferences
+                </motion.button>
+              </motion.div>
+            )}
           </AnimatePresence>
           {/* Custom Glass Dialog for Movie Info */}
       <AnimatePresence>
@@ -848,7 +873,8 @@ function ReelaxApp() {
           }
         }
       `}</style>
-    </motion.div>
+      </motion.div>
+    </div>
   );
 }
 
