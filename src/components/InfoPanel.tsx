@@ -79,7 +79,7 @@ export default function InfoPanel() {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
     >
-      <div className="absolute top-6 left-8 z-50 flex flex-col items-start text-left pointer-events-none select-none">
+      <div className="absolute top-6 left-8 z-50 flex flex-col items-start text-left select-none">
         <motion.span 
           className="text-white text-xl font-bold tracking-wide"
           initial={{ opacity: 0, x: -20 }}
@@ -94,7 +94,15 @@ export default function InfoPanel() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
         >
-          scatter by moeez
+          <span className="pointer-events-auto">
+            <Link
+              href="https://scatter.moeezs.com"
+              target="_blank"
+              className="underline text-white/70 text-sm hover:text-white/90 transition-colors"
+            >
+              scatter
+            </Link>
+          </span> by moeez
         </motion.span>
       </div>
 
