@@ -34,7 +34,7 @@ export default function InfoPanel() {
     what: {
       title: 'What is Reelax? 🎬',
       body: [
-        'Reelax is a personalized movie recommendation engine built for the Scatter project where I create a fun new app every week! 🚀',
+        'Reelax is a personalized movie recommendation engine built for the Scatter project where I create a fun new app every week! 🚀 (get it "movie reel" and "relax" = "reelax"...',
         "Simply tell us your preferred genre, when you want to sleep, and how long you want to watch. We'll find movies that fit perfectly into your evening routine, so you can relax without the stress of choosing!",
       ],
     },
