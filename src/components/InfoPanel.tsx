@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, JSX } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 
 type TabKey = 'what' | 'how' | 'why' | 'other';
@@ -29,11 +30,11 @@ export default function InfoPanel() {
     { id: 'other', label: 'Other' },
   ];
 
-  const info: Record<TabKey, { title: string; body: string[] }> = {
+  const info: Record<TabKey, { title: string; body: (string | JSX.Element)[] }> = {
     what: {
       title: 'What is Reelax? 🎬',
       body: [
-        'Reelax is a personalized movie recommendation engine built for the Scatter project - where we create a fun new app every week! 🚀',
+        'Reelax is a personalized movie recommendation engine built for the Scatter project where I create a fun new app every week! 🚀',
         "Simply tell us your preferred genre, when you want to sleep, and how long you want to watch. We'll find movies that fit perfectly into your evening routine, so you can relax without the stress of choosing!",
       ],
     },
@@ -45,9 +46,9 @@ export default function InfoPanel() {
       ],
     },
     why: {
-      title: 'Why we built this 💡',
+      title: 'Why I built this 💡',
       body: [
-        'Part of the Scatter project where we ship creative apps weekly! Decision fatigue is real, especially after a long day. We wanted to create a tool that removes the stress of choosing what to watch.',
+        'Part of the Scatter project where I ship creative apps weekly! Decision fatigue is real, especially after a long day. I wanted to create a tool that removes the stress of choosing what to watch and also lets you pick a movie without you getting late for bed.',
         'By considering your sleep time and available viewing window, Reelax ensures you can enjoy a great movie without sacrificing rest. Perfect for those "I just want to relax but can\'t decide what to watch" moments!',
       ],
     },
@@ -55,8 +56,18 @@ export default function InfoPanel() {
       title: 'About Scatter 🌟',
       body: [
         'Scatter is our weekly app challenge where we build and ship fun, useful apps every single week. Each app tackles a different problem or explores new creative ideas!',
-        'From productivity tools to entertainment apps like Reelax, we\'re always experimenting with new concepts. Follow our journey as we scatter creative solutions across the web, one app at a time!',
-        'Want to see what we build next? Check out our other Scatter apps and join the fun! 🎉',
+        'From productivity tools to entertainment apps to silly gags, I\'m always experimenting with new concepts. Follow my journey as I scatter creative solutions across the web, one app at a time!',
+        <>
+          Want to see what we build next? Check out our other Scatter apps and join the fun{' '}
+          <Link
+            href="https://scatter.moeezs.com"
+            target="_blank"
+            className="underline text-blue-300 hover:text-blue-200 transition-colors"
+          >
+            here
+          </Link>
+          ! 🎉
+        </>,
       ],
     },
   };
@@ -169,9 +180,13 @@ export default function InfoPanel() {
             <div className="p-6 overflow-y-auto max-h-96">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-white">{info[activeTab].title}</h3>
-                {info[activeTab].body.map((text: string, idx: number) => (
-                  <p key={idx} className="text-white/80 leading-relaxed">{text}</p>
-                ))}
+                {info[activeTab].body.map((item, idx) =>
+                  typeof item === 'string' ? (
+                    <p key={idx} className="text-white/80 leading-relaxed">{item}</p>
+                  ) : (
+                    <span key={idx}>{item}</span>
+                  )
+                )}
               </div>
             </div>
             </motion.div>
